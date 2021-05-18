@@ -1,9 +1,11 @@
+import json
 import math
 import os
 
 import psutil
 import texttable as tt  # from somewhere?
 
+from collections import defaultdict
 from plotman import archive, job, manager, plot_util
 
 
@@ -199,3 +201,11 @@ def dirs_report(jobs, dir_cfg, sched_cfg, width):
         ])
 
     return '\n'.join(reports) + '\n'
+
+def json_report(jobs):
+    jobs_dict = defaultdict(list)
+    for _, j in enumerate(sorted(jobs, key=job.Job.get_time_wall)):
+        with j.proc.oneshot():
+            jobs_dict["jobs"].append(j.to_dict())
+    return json.dumps(jobs_dict)
+
